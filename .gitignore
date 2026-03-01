@@ -1,0 +1,36 @@
+# Virtual Environment
+venv/
+env/
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Output
+*.pdf
+*.png
+*.jpg
+output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cache files
+data/__cache__/
+
+# Raw data files (too large for GitHub)
+data/databento/
+
+# Debug files  
+debugger/

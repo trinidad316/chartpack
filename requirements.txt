@@ -1,0 +1,4 @@
+# Dependencies for MES Price Action Chart Pack Generator
+matplotlib>=3.7.0  # Chart generation and PDF export
+pandas>=2.0.0      # Data manipulation and CSV handling
+numpy>=1.24.0      # Numerical operations
