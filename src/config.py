@@ -8,8 +8,8 @@ Simple settings you can adjust to customize your chart pack
 # =============================================================================
 
 # How many 5-minute bars to show per chart
-# 120 bars = 10 hours (6am-4pm ET trading session)
-BARS_PER_CHART = 120
+# 160 bars = 13h20m (2:40am-4pm ET trading session)
+BARS_PER_CHART = 160
 
 # Moving Averages
 EMA_20 = 20          # Fast EMA period
@@ -60,6 +60,9 @@ ROUND_NUMBER_SPACING = 50         # Show lines every 50 points
 TITLE_SIZE = 12
 LABEL_SIZE = 8
 TICK_SIZE = 7
+
+# Y-axis padding (% of day's range added above and below price action)
+Y_AXIS_PADDING = 0.25        # 25% padding on each side
 
 # Chart spacing and margins
 CHART_SPACING = 1.0          # Annotation space between charts

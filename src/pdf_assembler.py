@@ -149,7 +149,7 @@ class PDFAssembler:
                         print(f"Adding Q{quarter} {segment_date.year} separator page...")
                         fig = self.create_quarter_separator_page(segment_date)
                         pdf.savefig(fig, dpi=DPI, facecolor='white', 
-                                   edgecolor='none', bbox_inches='tight')
+                                   edgecolor='none', bbox_inches=None)
                         plt.close(fig)
                         page_count += 1
                     current_quarter = (segment_date.year, quarter)
@@ -159,7 +159,7 @@ class PDFAssembler:
                     print(f"Adding {segment_date.strftime('%B %Y')} separator page...")
                     fig = self.create_month_separator_page(segment_date)
                     pdf.savefig(fig, dpi=DPI, facecolor='white', 
-                               edgecolor='none', bbox_inches='tight')
+                               edgecolor='none', bbox_inches=None)
                     plt.close(fig)
                     current_month = (segment_date.year, segment_date.month)
                     page_count += 1
@@ -182,7 +182,7 @@ class PDFAssembler:
                 
                 # Save to PDF
                 pdf.savefig(fig, dpi=DPI, facecolor='white', 
-                           edgecolor='none', bbox_inches='tight')
+                           edgecolor='none', bbox_inches=None)
                 plt.close(fig)
                 
                 i += len(page_segments)
@@ -222,13 +222,13 @@ class PDFAssembler:
                 print("Adding sample quarter separator page...")
                 fig = self.create_quarter_separator_page(segments[0].index[0])
                 pdf.savefig(fig, dpi=DPI, facecolor='white', 
-                           edgecolor='none', bbox_inches='tight')
+                           edgecolor='none', bbox_inches=None)
                 plt.close(fig)
                 
                 print("Adding sample month separator page...")
                 fig = self.create_month_separator_page(segments[0].index[0])
                 pdf.savefig(fig, dpi=DPI, facecolor='white', 
-                           edgecolor='none', bbox_inches='tight')
+                           edgecolor='none', bbox_inches=None)
                 plt.close(fig)
             
             # Add sample chart pages
@@ -240,7 +240,7 @@ class PDFAssembler:
                 
                 fig = self.create_page_with_charts(page_segments, page_num + 1, start_idx)
                 pdf.savefig(fig, dpi=DPI, facecolor='white', 
-                           edgecolor='none', bbox_inches='tight')
+                           edgecolor='none', bbox_inches=None)
                 plt.close(fig)
                 pages_generated += 1
         

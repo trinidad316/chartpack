@@ -89,13 +89,13 @@ class ChartGenerator:
                transform=ax.transAxes, fontsize=TITLE_SIZE,
                ha='center', va='top', color='#ccc', weight='normal', alpha=0.7)
         
-        # Auto-fit Y-axis to each day's actual price range (normalizes volatility)
+        # Auto-fit Y-axis to each day's actual price range
         y_min, y_max = data['low'].min(), data['high'].max()
         day_range = y_max - y_min
-        padding = day_range * 0.08  # 8% padding above and below
+        padding = day_range * Y_AXIS_PADDING
         y_bottom = y_min - padding
         y_top = y_max + padding
-        
+
         ax.set_ylim(y_bottom, y_top)
         
         # Y-axis ticks at '00 and '50 round number levels (every 25 points)
@@ -110,11 +110,10 @@ class ChartGenerator:
                 y_ticks.append(current_tick)
             current_tick += y_tick_spacing
         
-        # Force matplotlib to use our custom ticks
-        ax.set_yticks(y_ticks)
-        # Clean formatting for round numbers: "4,800" instead of "4,800.0000"
-        ax.set_yticklabels([f'{int(tick):,}' for tick in y_ticks])  # Format: "4,800", "4,825", etc.
+        # Force matplotlib to use our custom ticks with plain number formatting (no scientific notation)
         ax.yaxis.set_major_locator(plt.FixedLocator(y_ticks))
+        ax.yaxis.set_minor_locator(plt.NullLocator())
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(round(x))}'))
         ax.tick_params(axis='y', colors='#666', labelsize=TICK_SIZE)
         
         # Move Y-axis to the right side
@@ -189,8 +188,8 @@ class ChartGenerator:
 
 def chunk_data_into_segments(data, bars_per_chart=BARS_PER_CHART):
     """
-    Chunk data into 6am-4pm Eastern time sessions
-    Each chart shows the regular trading session from 6:00 AM to 4:00 PM ET (10 hours)
+    Chunk data into 2:40am-4pm Eastern time sessions
+    Each chart shows 160 bars (13h20m) from 2:40 AM to 4:00 PM ET
     """
     segments = []
     
@@ -198,12 +197,12 @@ def chunk_data_into_segments(data, bars_per_chart=BARS_PER_CHART):
     data_by_date = data.groupby(data.index.date)
     
     for date, day_data in data_by_date:
-        # Find 6am start for this date (Eastern Time)
-        start_time = pd.Timestamp(date).replace(hour=6, minute=0)
+        # Find 2:40am start for this date (Eastern Time)
+        start_time = pd.Timestamp(date).replace(hour=2, minute=40)
         # Find 4pm end for this date (Eastern Time)
         end_time = pd.Timestamp(date).replace(hour=16, minute=0)
 
-        # Filter to 6am-4pm window only
+        # Filter to 2:40am-4pm window only
         session_data = day_data[(day_data.index >= start_time) & (day_data.index < end_time)]
         
         # Split long sessions into multiple charts if needed for more charts per day
