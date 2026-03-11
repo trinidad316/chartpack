@@ -89,25 +89,12 @@ class ChartGenerator:
                transform=ax.transAxes, fontsize=TITLE_SIZE,
                ha='center', va='top', color='#ccc', weight='normal', alpha=0.7)
         
-        # Calculate Y-axis range based on desired number of '00/'50 round number levels
+        # Auto-fit Y-axis to each day's actual price range (normalizes volatility)
         y_min, y_max = data['low'].min(), data['high'].max()
-        price_center = (y_min + y_max) / 2
-        
-        # Show 2 levels of '00/'50 round numbers (each level = 50 points)
-        desired_levels = 2.0  # 2 levels for maximum tall candles
-        level_spacing = 50    # '00 and '50 levels are 50 points apart
-        target_range = desired_levels * level_spacing  # 3.5 * 50 = 175 points
-        
-        # Center the range around the price action
-        y_bottom = price_center - target_range / 2
-        y_top = price_center + target_range / 2
-        
-        # Ensure we don't cut off actual price action (small buffer only if needed)
-        actual_buffer = 5  # Small buffer to avoid clipping
-        if y_bottom > y_min - actual_buffer:
-            y_bottom = y_min - actual_buffer
-        if y_top < y_max + actual_buffer:
-            y_top = y_max + actual_buffer
+        day_range = y_max - y_min
+        padding = day_range * 0.08  # 8% padding above and below
+        y_bottom = y_min - padding
+        y_top = y_max + padding
         
         ax.set_ylim(y_bottom, y_top)
         
@@ -202,8 +189,8 @@ class ChartGenerator:
 
 def chunk_data_into_segments(data, bars_per_chart=BARS_PER_CHART):
     """
-    Chunk data into 2am-6pm Eastern time extended sessions
-    Each chart shows extended trading segments from 2:00 AM to 6:00 PM ET (16 hours)
+    Chunk data into 6am-4pm Eastern time sessions
+    Each chart shows the regular trading session from 6:00 AM to 4:00 PM ET (10 hours)
     """
     segments = []
     
@@ -211,12 +198,12 @@ def chunk_data_into_segments(data, bars_per_chart=BARS_PER_CHART):
     data_by_date = data.groupby(data.index.date)
     
     for date, day_data in data_by_date:
-        # Find 2am start for this date (Eastern Time)
-        start_time = pd.Timestamp(date).replace(hour=2, minute=0)
-        # Find 6pm end for this date (Eastern Time)  
-        end_time = pd.Timestamp(date).replace(hour=18, minute=0)
-        
-        # Filter to 2am-6pm window only
+        # Find 6am start for this date (Eastern Time)
+        start_time = pd.Timestamp(date).replace(hour=6, minute=0)
+        # Find 4pm end for this date (Eastern Time)
+        end_time = pd.Timestamp(date).replace(hour=16, minute=0)
+
+        # Filter to 6am-4pm window only
         session_data = day_data[(day_data.index >= start_time) & (day_data.index < end_time)]
         
         # Split long sessions into multiple charts if needed for more charts per day
