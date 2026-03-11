@@ -1,49 +1,69 @@
 """
-Configuration settings for MES Price Action Chart Pack Generator
+MES Chart Pack Configuration
+Simple settings you can adjust to customize your chart pack
 """
 
-# Chart Layout Configuration - 1x3 Vertical Stack Layout
-CHARTS_PER_ROW = 1  # 1 chart horizontally (full width)
-CHARTS_PER_COL = 3  # 3 rows vertically
-CHARTS_PER_PAGE = CHARTS_PER_ROW * CHARTS_PER_COL  # = 3 charts per page
+# =============================================================================
+# CHART SETTINGS
+# =============================================================================
 
-# Chart Technical Settings
-BARS_PER_CHART = 192  # 16 hours (2am-6pm) of 5-minute data - extended sessions for more bars per chart
-EMA_PERIOD = 20
-EMA_COLOR = 'black'  # Black EMA line
-EMA_ALPHA = 0.8
+# How many 5-minute bars to show per chart
+# 120 bars = 10 hours (6am-4pm ET trading session)
+BARS_PER_CHART = 120
 
-# Round Number Levels
-ROUND_NUMBER_COLOR = 'gray'
-ROUND_NUMBER_ALPHA = 0.15
-ROUND_NUMBER_INTERVALS = [0.00, 0.50]  # '00 and '50 levels
+# Moving Averages
+EMA_20 = 20          # Fast EMA period
+EMA_20_COLOR = 'black'       # Dark black line
+EMA_20_ALPHA = 0.8           # Opacity (0.0-1.0)
 
-# PDF Output Settings
-DPI = 300
-PAGE_SIZE = (27, 19)  # 27x19 inches (landscape) - larger to maintain bar spacing with 144 bars
-FIGURE_SIZE = (27, 19)
-MARGINS = {'top': 0.95, 'bottom': 0.05, 'left': 0.15, 'right': 0.85}  # Wide left/right margins, tight vertical for 3 charts
-CHART_SPACING = {'hspace': 0.25, 'wspace': 0.1}  # Moderate spacing between 3 vertical charts
+EMA_80 = 80          # Slow EMA period
+EMA_80_COLOR = "#DCDCDC"     # Light gray line
+EMA_80_ALPHA = 0.5           # Opacity (0.0-1.0)
 
-# Chart Styling - TradingView Style (Black & White)
-CANDLESTICK_COLORS = {
-    'up_color': 'black',      # Black for up candles
-    'down_color': 'white',    # White for down candles  
-    'up_wick': 'black',       # Black wicks for up
-    'down_wick': 'black',     # Black wicks for down
-    'edge_color': 'black'     # Black edges for all candles
-}
 
-GRID_STYLE = {
-    'color': 'lightgray',
-    'alpha': 0.3,
-    'linestyle': '-',
-    'linewidth': 0.5
-}
+# =============================================================================
+# PAGE LAYOUT
+# =============================================================================
 
-# Font Settings
-FONT_SIZES = {
-    'title': 12,
-    'axis_label': 8,
-    'tick_label': 7
-}
+# How many charts per page
+CHARTS_PER_PAGE = 2          # 2 charts stacked vertically
+
+# Page dimensions (inches)
+PAGE_WIDTH = 17              # 17 inches wide
+PAGE_HEIGHT = 11             # 11 inches tall
+
+# Print quality
+DPI = 300                    # 300 DPI for high quality printing
+
+
+# =============================================================================
+# CHART STYLING
+# =============================================================================
+
+# Candlestick colors
+UP_CANDLE = 'white'          # White body for bullish candles
+DOWN_CANDLE = 'black'        # Black body for bearish candles
+WICK_COLOR = 'black'         # Black wicks
+EDGE_COLOR = 'black'         # Black edges
+
+# Round number levels (horizontal lines at '00 and '50 prices)
+ROUND_NUMBER_COLOR = '#d0d0d0'    # Light gray
+ROUND_NUMBER_ALPHA = 0.6          # Opacity
+ROUND_NUMBER_SPACING = 50         # Show lines every 50 points
+
+
+# =============================================================================
+# ADVANCED SETTINGS (usually don't need to change these)
+# =============================================================================
+
+# Font sizes
+TITLE_SIZE = 12
+LABEL_SIZE = 8
+TICK_SIZE = 7
+
+# Chart spacing and margins
+CHART_SPACING = 1.0          # Annotation space between charts
+LEFT_MARGIN = 0.15           # Wide margins for annotations
+RIGHT_MARGIN = 0.85
+TOP_MARGIN = 0.97            # (1 - 0.25/11 ≈ 0.977)
+BOTTOM_MARGIN = 0.03         # (0.25/11 ≈ 0.023)

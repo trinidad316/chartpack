@@ -19,13 +19,13 @@ class ChartGenerator:
         plt.rcParams.update({
             'figure.dpi': DPI,
             'savefig.dpi': DPI,
-            'font.size': FONT_SIZES['tick_label'],
-            'axes.labelsize': FONT_SIZES['axis_label'],
-            'axes.titlesize': FONT_SIZES['title'],
-            'xtick.labelsize': FONT_SIZES['tick_label'],
-            'ytick.labelsize': FONT_SIZES['tick_label'],
-            'legend.fontsize': FONT_SIZES['tick_label'],
-            'figure.titlesize': FONT_SIZES['title']
+            'font.size': TICK_SIZE,
+            'axes.labelsize': LABEL_SIZE,
+            'axes.titlesize': TITLE_SIZE,
+            'xtick.labelsize': TICK_SIZE,
+            'ytick.labelsize': TICK_SIZE,
+            'legend.fontsize': TICK_SIZE,
+            'figure.titlesize': TITLE_SIZE
         })
     
     def create_candlestick_chart(self, ax, data, title=""):
@@ -65,20 +65,28 @@ class ChartGenerator:
         
         return ax
     
-    def add_ema_overlay(self, ax, data, period=EMA_PERIOD):
-        """Add EMA overlay to the chart"""
-        if len(data) >= period:
-            ema = data['close'].ewm(span=period).mean()
-            x_positions = range(len(data))
-            ax.plot(x_positions, ema.values, color=EMA_COLOR, 
-                   alpha=EMA_ALPHA, linewidth=1.0, label=f'{period} EMA', zorder=2)
+    def add_ema_overlay(self, ax, data):
+        """Add EMA overlays to the chart (20 EMA and 80 EMA)"""
+        x_positions = range(len(data))
+
+        # Add 80 EMA (slower, lighter) - drawn first so it's behind
+        if len(data) >= EMA_80:
+            ema_slow = data['close'].ewm(span=EMA_80).mean()
+            ax.plot(x_positions, ema_slow.values, color=EMA_80_COLOR,
+                   alpha=EMA_80_ALPHA, linewidth=1.0, label=f'{EMA_80} EMA', zorder=1)
+
+        # Add 20 EMA (faster, darker) - drawn second so it's on top
+        if len(data) >= EMA_20:
+            ema_fast = data['close'].ewm(span=EMA_20).mean()
+            ax.plot(x_positions, ema_fast.values, color=EMA_20_COLOR,
+                   alpha=EMA_20_ALPHA, linewidth=1.0, label=f'{EMA_20} EMA', zorder=2)
     
     def format_chart_axes(self, ax, data, chart_index):
         """Format chart axes with TradingView-style formatting and compressed Y-axis"""
         # Set date in top center with very light font for subtle reference
         chart_date = data.index[0].strftime('%m/%d/%Y')
-        ax.text(0.5, 0.95, chart_date, 
-               transform=ax.transAxes, fontsize=FONT_SIZES['title'], 
+        ax.text(0.5, 0.95, chart_date,
+               transform=ax.transAxes, fontsize=TITLE_SIZE,
                ha='center', va='top', color='#ccc', weight='normal', alpha=0.7)
         
         # Calculate Y-axis range based on desired number of '00/'50 round number levels
@@ -120,7 +128,7 @@ class ChartGenerator:
         # Clean formatting for round numbers: "4,800" instead of "4,800.0000"
         ax.set_yticklabels([f'{int(tick):,}' for tick in y_ticks])  # Format: "4,800", "4,825", etc.
         ax.yaxis.set_major_locator(plt.FixedLocator(y_ticks))
-        ax.tick_params(axis='y', colors='#666', labelsize=FONT_SIZES['tick_label'])
+        ax.tick_params(axis='y', colors='#666', labelsize=TICK_SIZE)
         
         # Move Y-axis to the right side
         ax.yaxis.tick_right()
@@ -142,7 +150,7 @@ class ChartGenerator:
         
         # Set major ticks at hourly intervals
         ax.set_xticks(hourly_positions)
-        ax.set_xticklabels(hourly_labels, color='#666', fontsize=FONT_SIZES['tick_label'])
+        ax.set_xticklabels(hourly_labels, color='#666', fontsize=TICK_SIZE)
         ax.tick_params(axis='x', which='major', colors='#666', length=5, width=1)
         
         # Add minor tick marks at 30-minute intervals on the X-axis itself
@@ -159,14 +167,13 @@ class ChartGenerator:
         ax.grid(False)  # Turn off automatic grid
         
         # Add horizontal lines only at major '00 and '50 round number levels
-        major_spacing = 50  # Major round numbers (50-point intervals for '00 and '50 levels)
-        major_start = int((y_bottom - 25) // major_spacing) * major_spacing
+        major_start = int((y_bottom - 25) // ROUND_NUMBER_SPACING) * ROUND_NUMBER_SPACING
         current_major = major_start
         while current_major <= y_top + 25:
             if y_bottom <= current_major <= y_top:
                 # Light horizontal lines only at '00 and '50 levels
-                ax.axhline(y=current_major, color='#d0d0d0', alpha=0.6, linewidth=0.4, zorder=0)
-            current_major += major_spacing
+                ax.axhline(y=current_major, color=ROUND_NUMBER_COLOR, alpha=ROUND_NUMBER_ALPHA, linewidth=0.4, zorder=0)
+            current_major += ROUND_NUMBER_SPACING
         
         # Set axis limits
         ax.set_xlim(0, len(data) - 1)
@@ -179,7 +186,7 @@ class ChartGenerator:
     
     def create_individual_chart(self, data_segment, chart_index):
         """Create a complete individual chart with all overlays"""
-        fig, ax = plt.subplots(1, 1, figsize=(9, 6))
+        fig, ax = plt.subplots(1, 1, figsize=(15, 4))
         
         # Create the candlestick chart
         self.create_candlestick_chart(ax, data_segment)

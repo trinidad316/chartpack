@@ -18,23 +18,18 @@ class PDFAssembler:
         Create a single page with up to 4 charts in 2x2 grid
         """
         # Create figure with TradingView-style clean layout
-        fig = plt.figure(figsize=FIGURE_SIZE, facecolor='white')
+        fig = plt.figure(figsize=(PAGE_WIDTH, PAGE_HEIGHT), facecolor='white')
         fig.patch.set_facecolor('white')
-        
-        # Add page header - centered
-        page_title = f"Chart Pack - {page_number}"
-        fig.text(0.5, 0.98, page_title, fontsize=FONT_SIZES['title'] + 2, 
-                ha='center', va='top', transform=fig.transFigure)
-        
+
         # Create subplots in 2x2 grid
         charts_on_page = min(len(data_segments), CHARTS_PER_PAGE)
         
         for i, segment in enumerate(data_segments[:CHARTS_PER_PAGE]):
             # Calculate subplot position for current layout
             subplot_index = i + 1
-            
-            # Create subplot (nrows=CHARTS_PER_COL, ncols=CHARTS_PER_ROW, index=subplot_index)
-            ax = plt.subplot(CHARTS_PER_COL, CHARTS_PER_ROW, subplot_index)
+
+            # Create subplot (3 charts stacked vertically)
+            ax = plt.subplot(CHARTS_PER_PAGE, 1, subplot_index)
             
             # Generate the chart
             self.chart_generator.create_candlestick_chart(ax, segment)
@@ -43,12 +38,11 @@ class PDFAssembler:
         
         # Adjust layout
         plt.subplots_adjust(
-            top=MARGINS['top'], 
-            bottom=MARGINS['bottom'],
-            left=MARGINS['left'], 
-            right=MARGINS['right'],
-            hspace=CHART_SPACING['hspace'], 
-            wspace=CHART_SPACING['wspace']
+            top=TOP_MARGIN,
+            bottom=BOTTOM_MARGIN,
+            left=LEFT_MARGIN,
+            right=RIGHT_MARGIN,
+            hspace=CHART_SPACING
         )
         
         
@@ -56,7 +50,7 @@ class PDFAssembler:
     
     def create_month_separator_page(self, month_date):
         """Create a dedicated month separator page"""
-        fig = plt.figure(figsize=FIGURE_SIZE, facecolor='white')
+        fig = plt.figure(figsize=(PAGE_WIDTH, PAGE_HEIGHT), facecolor='white')
         fig.patch.set_facecolor('white')
         
         # Create single large text area
@@ -81,7 +75,7 @@ class PDFAssembler:
     
     def create_quarter_separator_page(self, quarter_date):
         """Create a dedicated quarter separator page"""
-        fig = plt.figure(figsize=FIGURE_SIZE, facecolor='white')
+        fig = plt.figure(figsize=(PAGE_WIDTH, PAGE_HEIGHT), facecolor='white')
         fig.patch.set_facecolor('white')
         
         # Create single large text area
@@ -204,7 +198,7 @@ class PDFAssembler:
         print(f"✅ PDF generated successfully: {output_filename}")
         print(f"📊 Total charts: {total_charts}")
         print(f"📄 Total pages: {page_count} (including month/quarter separators)")
-        print(f"🖨️  Recommended print size: {PAGE_SIZE[0]}\"x{PAGE_SIZE[1]}\" landscape")
+        print(f"🖨️  Recommended print size: {PAGE_WIDTH}\"x{PAGE_HEIGHT}\" landscape")
         
         return output_filename
     
